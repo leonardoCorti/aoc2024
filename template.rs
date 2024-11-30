@@ -1,8 +1,8 @@
 use super::Day;
 
-pub struct Day01;
+pub struct DayXX;
 
-impl Day for Day01 {
+impl Day for DayXX {
     fn part1(&self, input: &str) -> String {
         return input.chars().count().to_string();
     }
@@ -25,13 +25,13 @@ mod tests {
 
     #[test]
     fn part1_test() {
-        let day = Day01;
+        let day = DayXX;
         assert_eq!(day.part1(INPUT), "18");
     }
 
     #[test]
     fn part2_test() {
-        let day = Day01;
+        let day = DayXX;
         assert_eq!(day.part2(INPUT), "6");
     }
 }
