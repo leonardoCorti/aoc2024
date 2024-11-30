@@ -1,19 +1,19 @@
 use std::env;
 use std::fs;
 use std::process::Command;
+use std::process::Stdio;
+use std::time::Instant;
 
 pub mod days;
 
 fn download_input(day: u32, session_cookie: &str) -> Result<(), String> {
     let file_path = format!("inputs/{}.txt", day);
 
-    // Check if the file already exists
     if fs::metadata(&file_path).is_ok() {
         println!("File for day {} already exists.", day);
         return Ok(());
     }
 
-    // If file doesn't exist, download it using curl
     let url = format!("https://adventofcode.com/2024/day/{}/input", day);
     let status = Command::new("curl")
         .arg("-o")
@@ -21,21 +21,14 @@ fn download_input(day: u32, session_cookie: &str) -> Result<(), String> {
         .arg("-H")
         .arg(format!("Cookie: session={}", session_cookie))
         .arg(&url)
+        .stdout(Stdio::null())
+        .stderr(Stdio::null())
         .status();
 
-    // match status {
-    //     Ok(status) if status.success() => {
-    //         println!("Successfully downloaded input for day {}.", day);
-    //         Ok(())
-    //     }
-    //     _ => Err(format!("Failed to download input for day {}.", day)),
-    // }
     match status {
         Ok(status) if status.success() => {
-            // Check if the downloaded file contains the "not available" message
             if let Ok(contents) = fs::read_to_string(&file_path) {
                 if contents.contains("Please don't repeatedly request this endpoint before it unlocks!") {
-                    // Remove the file if it contains the error message
                     fs::remove_file(&file_path).unwrap_or_else(|err| {
                         eprintln!("Failed to remove invalid input file: {}", err);
                     });
@@ -61,7 +54,6 @@ fn main() {
         std::process::exit(1);
     }
 
-    // Fetch the session cookie from environment variables
     let session_cookie = match env::var("AOC_SESSION_COOKIE") {
         Ok(val) => val,
         Err(_) => {
@@ -70,10 +62,11 @@ fn main() {
         }
     };
 
+    let days = days::get_days();
+
     for arg in args {
         let day: u32 = arg.parse().expect("Day should be a valid number");
 
-        // Download input for the given day
         if let Err(e) = download_input(day, &session_cookie) {
             eprintln!("{}", e);
             continue;
@@ -83,11 +76,20 @@ fn main() {
         let input = fs::read_to_string(&input_file)
             .unwrap_or_else(|_| panic!("Failed to read input file: {}", input_file));
 
-        // Now you can use the `input` in your Day logic
-        let days = days::get_days();
         if let Some(day_impl) = days.get(&day) {
-            println!("Day {}, Part 1: {}", day, day_impl.part1(&input));
-            println!("Day {}, Part 2: {}", day, day_impl.part2(&input));
+            println!("Running Day {}...", day);
+
+            let start = Instant::now();
+            let part1_result = day_impl.part1(&input);
+            let part1_duration = start.elapsed();
+            println!("Day {}, Part 1: {}", day, part1_result);
+            println!("Execution time for Part 1: {:.2?}", part1_duration);
+
+            let start = Instant::now();
+            let part2_result = day_impl.part2(&input);
+            let part2_duration = start.elapsed();
+            println!("Day {}, Part 2: {}", day, part2_result);
+            println!("Execution time for Part 2: {:.2?}", part2_duration);
         } else {
             eprintln!("Day {} is not implemented yet.", day);
         }
