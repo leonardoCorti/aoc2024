@@ -1,5 +1,6 @@
 use std::env;
 use std::fs;
+use std::path::Path;
 use std::process::Command;
 use std::process::Stdio;
 use std::time::Instant;
@@ -8,6 +9,11 @@ pub mod days;
 
 fn download_input(day: u32, session_cookie: &str) -> Result<(), String> {
     let file_path = format!("inputs/{}.txt", day);
+
+    if !Path::new("inputs").exists() {
+        fs::create_dir("inputs")
+            .expect("couldn't create inputs directory");
+    }
 
     if fs::metadata(&file_path).is_ok() {
         println!("File for day {} already exists.", day);
