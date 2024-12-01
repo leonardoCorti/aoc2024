@@ -24,7 +24,7 @@ run_all:
 #test all days
 [group('test')]
 test_all:
-	cargo test -- $(seq {{day}})
+	cargo test
 
 #run today in release mode
 [group('run')]
