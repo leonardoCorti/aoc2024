@@ -5,6 +5,8 @@ use std::process::Command;
 use std::process::Stdio;
 use std::time::Instant;
 
+use colored::Colorize;
+
 pub mod days;
 
 fn download_input(day: u32, session_cookie: &str) -> Result<(), String> {
@@ -53,6 +55,7 @@ fn download_input(day: u32, session_cookie: &str) -> Result<(), String> {
 }
 
 fn main() {
+    println!();
     let args: Vec<String> = env::args().skip(1).collect();
 
     if args.is_empty() {
@@ -83,19 +86,30 @@ fn main() {
             .unwrap_or_else(|_| panic!("Failed to read input file: {}", input_file));
 
         if let Some(day_impl) = days.get(&day) {
-            println!("Running Day {}...", day);
+            println!("Running Day {}...", 
+                day.to_string().blue());
 
             let start = Instant::now();
             let part1_result = day_impl.part1(&input);
             let part1_duration = start.elapsed();
-            println!("Day {}, Part 1: {}", day, part1_result);
-            println!("Execution time for Part 1: {:.2?}", part1_duration);
+            let part1_duration_string = format!("{:.2?}", part1_duration);
+            println!("\tDay {}, Part {}: {}, execution time {}",
+                day.to_string().blue(),
+                "1".blue(),
+                part1_result.to_string().red(),
+                part1_duration_string.purple());
 
             let start = Instant::now();
             let part2_result = day_impl.part2(&input);
             let part2_duration = start.elapsed();
-            println!("Day {}, Part 2: {}", day, part2_result);
-            println!("Execution time for Part 2: {:.2?}", part2_duration);
+            let part2_duration_string = format!("{:.2?}", part2_duration);
+            println!("\tDay {}, Part {}: {}, execution time {}",
+                day.to_string().blue(),
+                "2".blue(),
+                part2_result.to_string().red(),
+                part2_duration_string.purple());
+
+            println!();
         } else {
             eprintln!("Day {} is not implemented yet.", day);
         }
