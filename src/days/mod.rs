@@ -1,4 +1,5 @@
 pub mod day01;
+pub mod day02;
 
 use std::collections::HashMap;
 
@@ -20,5 +21,6 @@ macro_rules! register_days {
 pub fn get_days() -> HashMap<u32, Box<dyn Day>> {
     register_days! {
         1 => day01::Day01,
+        2 => day02::Day02,
     }
 }
