@@ -7,10 +7,10 @@ use std::time::Instant;
 
 use colored::Colorize;
 
-pub mod days;
+use aoc2024::days;
 
 fn download_input(day: u32, session_cookie: &str) -> Result<(), String> {
-    let file_path = format!("inputs/{}.txt", day);
+    let file_path = format!("inputs/{:02}.txt", day);
 
     if !Path::new("inputs").exists() {
         fs::create_dir("inputs")
@@ -81,7 +81,7 @@ fn main() {
             continue;
         }
 
-        let input_file = format!("inputs/{}.txt", day);
+        let input_file = format!("inputs/{:02}.txt", day);
         let input = fs::read_to_string(&input_file)
             .unwrap_or_else(|_| panic!("Failed to read input file: {}", input_file));
 
