@@ -29,3 +29,19 @@ Available recipes:
     test_today  # run tests for today
     t           # alias for `test_today`
 ```
+
+## performance
+
+| day | part | time mean |
+| --- | ---- | --------- |
+| 1   | 1    | 86.809 µs |
+| 1   | 2    | 123.12 µs |
+| 2   | 1    | 169.50 µs |
+| 2   | 2    | 2.3958 ms |
+| 3   | 1    | 407.92 µs |
+| 3   | 2    | 746.34 µs |
+| 4   | 1    | 2.0572 ms |
+| 4   | 2    | 538.89 µs |
+| 5   | 1    | 2.7889 ms |
+| 5   | 2    | 1.1875 ms |
+
