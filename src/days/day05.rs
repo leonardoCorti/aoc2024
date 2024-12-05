@@ -34,19 +34,98 @@ impl Day for Day05 {
     }
 
     fn part2(&self, input: &str) -> String {
-        return input.chars()
-            .map(|e| e.to_digit(10))
-            .filter(|e| e.is_some())
-            .map(|e| e.unwrap())
-            .fold(0, |a,b| a+b )
-            .to_string();
+        let mut parts = input.split("\n\n");
+        let input_rules = parts.next().unwrap();
+        let input_pages = parts.next().unwrap();
+        let mut rules: HashMap<u32,Vec<u32>> = HashMap::new();
+
+        for line in input_rules.lines() {
+            let mut parts = line.split("|");
+            let first_number: u32 = parts.next().unwrap().parse().unwrap();
+            let second_number: u32 = parts.next().unwrap().parse().unwrap();
+            match rules.get_mut(&first_number) {
+                Some(vector) => {
+                    vector.push(second_number);
+                },
+                None => {
+                    rules.insert(first_number, vec![second_number]);
+                },
+            }
+        }
+
+        let updates: Vec<Vec<u32>> = input_pages.lines()
+            .map(|l| l.split(",")
+                .map(|e| e.parse::<u32>().unwrap())
+                .collect())
+            .collect();
+        // println!("rules are {rules:?}");
+        // println!("updates are {updates:?}");
+
+        let mut accumulator = 0;
+
+        for mut update in updates {
+            // println!("checking {update:?}");
+            if is_correct_print_order_vec(&update, &rules) {
+                // println!("is correct order, passing on");
+                continue;
+            }
+            let mut limit =0;
+            while !is_correct_print_order_vec(&update, &rules) {
+                // println!("reordering {update:?}");
+                reorder(&mut update, &rules);
+                // println!("reordered {update:?}");
+                // break;
+                limit +=1;
+                if limit == 10 {
+                    // break;
+                }
+            }
+            // println!("finished reordering");
+
+            accumulator += update[update.len()/2];
+            // println!("accumulator is now {accumulator}");
+        }
+        return accumulator.to_string();
     }
+}
+
+fn reorder(update: &mut Vec<u32>, rules: &HashMap<u32, Vec<u32>>) {
+    // println!("\t reordering!");
+    for i in (0..update.len()).rev() {
+        // println!("searching the {i}, it is {:?}", update[i]);
+        if let Some(rule) = rules.get(&update[i]) {
+            // println!("found rule {:?}", rule);
+            for j in 0..i {
+                if rule.contains(&update[j]) {
+                    // println!("\t FOUND IT at {j}, {} and {} will be replaced", update[j], update[i]);
+                    let number = update[i];
+                    update.remove(i);
+                    update.insert(j, number);
+                    return;
+                }
+            }
+        }
+    }
+    // println!("\t finished reordering!");
+}
+
+fn is_correct_print_order_vec(l: &Vec<u32>, rules: &HashMap<u32, Vec<u32>>) -> bool {
+    let reverse_l: Vec<u32> = l.iter().rev().map(|e| *e).collect();
+    for (i,page) in reverse_l.iter().enumerate() {
+        if let Some(rule) = rules.get(page){
+            for r in rule {
+                if reverse_l[i..].contains(r) {
+                    return false;
+                }
+            }
+        }
+    }
+    return true;
 }
 
 fn find_middle_page_number(input: &str) -> i32 {
     let list: Vec<&str> = input.split(",").collect();
     let lenght = list.len();
-    // println!("received {list:?}, returning {}", list[lenght/2]);
     return list[lenght/2].parse().unwrap();
 }
 
@@ -114,6 +193,6 @@ mod tests {
     #[test]
     fn part2_test() {
         let day = Day05;
-        assert_eq!(day.part2(INPUT), "6");
+        assert_eq!(day.part2(INPUT), "123");
     }
 }
