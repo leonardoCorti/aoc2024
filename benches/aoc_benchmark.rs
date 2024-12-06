@@ -57,5 +57,16 @@ fn day5(c: &mut Criterion) {
     ));
 }
 
-criterion_group!(benches, day1, day2, day3, day4, day5);
+fn day6(c: &mut Criterion) {
+    c.bench_function("day6 part1", |b| b.iter(||
+        day06::Day06
+            .part1(black_box(include_str!("../inputs/06.txt")))
+    ));
+    c.bench_function("day6 part2", |b| b.iter(||
+        day06::Day06
+            .part2(black_box(include_str!("../inputs/06.txt")))
+    ));
+}
+
+criterion_group!(benches, day1, day2, day3, day4, day5, day6);
 criterion_main!(benches);

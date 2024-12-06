@@ -1,5 +1,5 @@
 use core::panic;
-use std::fmt::Display;
+use std::{fmt::Display, usize};
 
 use super::Day;
 
@@ -15,12 +15,44 @@ impl Day for Day06 {
     }
 
     fn part2(&self, input: &str) -> String {
-        return input.chars()
-            .map(|e| e.to_digit(10))
-            .filter(|e| e.is_some())
-            .map(|e| e.unwrap())
-            .fold(0, |a,b| a+b )
-            .to_string();
+        let mut map = Map::from_string(input);
+        while !map.is_guard_finished() {
+            map.move_guard();
+        }
+        let mut visited_places: Vec<(i32,i32)> = Vec::new();
+        for (x,line) in map.map.iter().enumerate() {
+            for (y,pos) in line.iter().enumerate() {
+                if *pos == Position::Visited {
+                    visited_places.push((x as i32, y as i32));
+                }
+            }
+        }
+        
+        let mut result = 0;
+        for (visited_x, visited_y) in visited_places {
+            let mut test_map = Map::from_string(input);
+            if (visited_x,visited_y) == test_map.guard_position {
+                continue;
+            }
+            test_map.map[visited_x as usize][visited_y as usize] = Position::Obstacle;
+
+            let mut guard_positions: Vec<((i32,i32),Direction)> = Vec::new();
+            
+            while !test_map.is_guard_finished() {
+                test_map.move_guard();
+
+                let guard_position = test_map.guard_position;
+                let guard_direction= test_map.guard_direction;
+
+                if guard_positions.contains(&(guard_position,guard_direction)) {
+                    result += 1;
+                    break;
+                }
+                guard_positions.push((guard_position,guard_direction));
+            }
+        }
+
+        return result.to_string();
     }
 }
 
