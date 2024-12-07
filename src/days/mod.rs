@@ -4,6 +4,7 @@ pub mod day03;
 pub mod day04;
 pub mod day05;
 pub mod day06;
+pub mod day07;
 
 use std::collections::HashMap;
 
@@ -30,5 +31,6 @@ pub fn get_days() -> HashMap<u32, Box<dyn Day>> {
         4 => day04::Day04,
         5 => day05::Day05,
         6 => day06::Day06,
+        7 => day07::Day07,
     }
 }
