@@ -1,3 +1,5 @@
+use rayon::prelude::*;
+
 use super::Day;
 
 pub struct Day07;
@@ -56,34 +58,34 @@ impl Equation {
             return false;
         }
 
-        let mut operators_combinations = Vec::new();
-        for i in 0..(1 << (num_values - 1)) { 
-            let mut combination = Vec::new();
-            for j in 0..(num_values - 1) {
-                if (i & (1 << j)) != 0 {
-                    combination.push(Operators::Add);
-                } else {
-                    combination.push(Operators::Multiply);
-                }
-            }
-            operators_combinations.push(combination);
-        }
+        let total_combinations = 2_usize.pow((num_values - 1) as u32);
 
-        for ops in operators_combinations {
+        return (0..total_combinations).into_par_iter().any(|i| {
+            let mut ops = Vec::new();
+            let mut n = i;
+
+            for _ in 0..(num_values - 1) {
+                match n % 2 {
+                    0 => ops.push(Operators::Add),
+                    1 => ops.push(Operators::Multiply),
+                    _ => unreachable!(),
+                }
+                n /= 2;
+            }
+
             let mut result = self.values[0];
             for (i, op) in ops.iter().enumerate() {
                 match op {
                     Operators::Add => result += self.values[i + 1],
                     Operators::Multiply => result *= self.values[i + 1],
-                    Operators::Concat => panic!("should not happen"),
+                    Operators::Concat => {
+                        unreachable!()
+                    }
                 }
             }
 
-            if result == self.result {
-                return true;
-            }
-        }
-        return false;
+            result == self.result
+        });
     }
 
     fn exists_solution_concat(&self) -> bool {
@@ -92,23 +94,22 @@ impl Equation {
             return false;
         }
 
-        let mut operators_combinations = Vec::new();
-        for i in 0..(3_usize.pow((num_values - 1) as u32)) {
-            let mut combination = Vec::new();
+        let total_combinations = 3_usize.pow((num_values - 1) as u32);
+
+        return (0..total_combinations).into_par_iter().any(|i| {
+            let mut ops = Vec::new();
             let mut n = i;
+
             for _ in 0..(num_values - 1) {
                 match n % 3 {
-                    0 => combination.push(Operators::Add),
-                    1 => combination.push(Operators::Multiply),
-                    2 => combination.push(Operators::Concat),
+                    0 => ops.push(Operators::Add),
+                    1 => ops.push(Operators::Multiply),
+                    2 => ops.push(Operators::Concat),
                     _ => unreachable!(),
                 }
                 n /= 3;
             }
-            operators_combinations.push(combination);
-        }
 
-        for ops in operators_combinations {
             let mut result = self.values[0];
             for (i, op) in ops.iter().enumerate() {
                 match op {
@@ -121,11 +122,8 @@ impl Equation {
                 }
             }
 
-            if result == self.result {
-                return true;
-            }
-        }
-        return false;
+            result == self.result
+        });
     }
 
 }

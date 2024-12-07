@@ -8,6 +8,7 @@ alias t := test_today
 alias p1 := part1
 alias p2 := part2
 alias c := clean
+alias b := bench_today
 
 _default: test_today
 
@@ -17,12 +18,22 @@ clean:
 	cargo clean
 
 #benchmak everything
+[group('benchmakrs')]
 bench:
 	cargo bench
 
 #benchmak only the <days>
+[group('benchmakrs')]
 bench_days +days:
 	cargo bench {{days}}
+
+#benchmak today
+[group('benchmakrs')]
+[group('useful')]
+bench_today:
+	#!/bin/bash
+	export bench_day=$(echo {{day}} | sed -E 's/\b0+([1-9])/\1/g')
+	cargo bench "day$bench_day"
 
 #run all days in release mode
 [group('run')]
