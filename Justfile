@@ -16,6 +16,14 @@ clean:
 	rm -r inputs
 	cargo clean
 
+#benchmak everything
+bench:
+	cargo bench
+
+#benchmak only the <days>
+bench_days +days:
+	cargo bench {{days}}
+
 #run all days in release mode
 [group('run')]
 run_all: 

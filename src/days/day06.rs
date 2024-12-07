@@ -1,6 +1,8 @@
 use core::panic;
 use std::{fmt::Display, usize};
 
+use rayon::prelude::*;
+
 use super::Day;
 
 pub struct Day06;
@@ -27,30 +29,30 @@ impl Day for Day06 {
                 }
             }
         }
-        
-        let mut result = 0;
-        for (visited_x, visited_y) in visited_places {
-            let mut test_map = Map::from_string(input);
-            if (visited_x,visited_y) == test_map.guard_position {
-                continue;
-            }
-            test_map.map[visited_x as usize][visited_y as usize] = Position::Obstacle;
 
-            let mut guard_positions: Vec<((i32,i32),Direction)> = Vec::new();
-            
-            while !test_map.is_guard_finished() {
-                test_map.move_guard();
-
-                let guard_position = test_map.guard_position;
-                let guard_direction= test_map.guard_direction;
-
-                if guard_positions.contains(&(guard_position,guard_direction)) {
-                    result += 1;
-                    break;
+        let result = visited_places.into_par_iter()
+            .filter(|(visited_x, visited_y)| {
+                let mut test_map = Map::from_string(input);
+                if (*visited_x,*visited_y) == test_map.guard_position {
+                    return false;
                 }
-                guard_positions.push((guard_position,guard_direction));
-            }
-        }
+                test_map.map[*visited_x as usize][*visited_y as usize] = Position::Obstacle;
+
+                let mut guard_positions: Vec<((i32,i32),Direction)> = Vec::new();
+                while !test_map.is_guard_finished() {
+                    test_map.move_guard();
+
+                    let guard_position = test_map.guard_position;
+                    let guard_direction= test_map.guard_direction;
+
+                    if guard_positions.contains(&(guard_position,guard_direction)) {
+                        return true;
+                    }
+                    guard_positions.push((guard_position,guard_direction));
+                }
+                return false;
+            })
+            .count();
 
         return result.to_string();
     }

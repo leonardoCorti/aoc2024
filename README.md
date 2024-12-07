@@ -4,30 +4,32 @@ these are my [advent of code](https://adventofcode.com/2024) solutions for 2024 
 there is a Justfile with some commands to make it easier to use, it needs bash
 ```just
 Available recipes:
-    clean       # clean inputs and cargo files
-    c           # alias for `clean`
+    bench            # benchmak everything
+    bench_days +days # benchmak only the <days>
+    clean            # clean inputs and cargo files
+    c                # alias for `clean`
 
     [run]
-    days +days  # run <days> in release mode
-    run_all     # run all days in release mode
-    run_today   # run today in release mode
-    r           # alias for `run_today`
+    days +days       # run <days> in release mode
+    run_all          # run all days in release mode
+    run_today        # run today in release mode
+    r                # alias for `run_today`
 
     [test]
-    part1       # run the test for part 1 of today
-    p1          # alias for `part1`
-    part2       # run the test for part 2 of today
-    p2          # alias for `part2`
-    test_all    # test all days
-    test_today  # run tests for today
-    t           # alias for `test_today`
-    tests +days # run tests for <days>
+    part1            # run the test for part 1 of today
+    p1               # alias for `part1`
+    part2            # run the test for part 2 of today
+    p2               # alias for `part2`
+    test_all         # test all days
+    test_today       # run tests for today
+    t                # alias for `test_today`
+    tests +days      # run tests for <days>
 
     [useful]
-    run_today   # run today in release mode
-    r           # alias for `run_today`
-    test_today  # run tests for today
-    t           # alias for `test_today`
+    run_today        # run today in release mode
+    r                # alias for `run_today`
+    test_today       # run tests for today
+    t                # alias for `test_today`
 ```
 
 ## performance
@@ -45,5 +47,5 @@ Available recipes:
 | 5   | 1    | 2.7889 ms |
 | 5   | 2    | 1.1875 ms |
 | 6   | 1    | 74.101 µs |
-| 6   | 2    | 375.74 ms |
+| 6   | 2    | 43.495 ms |
 
