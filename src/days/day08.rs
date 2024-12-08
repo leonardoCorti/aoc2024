@@ -7,7 +7,45 @@ pub struct Day08;
 impl Day for Day08 {
     fn part1(&self, input: &str) -> String {
         let map: Map = Map::from_str(input);
-        // println!("test:\n{}", map);
+        let mut taken_positions: HashSet<(i32,i32)> = HashSet::new();
+        let mut antinodes: HashSet<(i32,i32)> = HashSet::new();
+
+        for (_, values) in &map.antennas {
+            for value in values {
+                taken_positions.insert(*value);
+            }
+        }
+
+        for (_, values) in &map.antennas {
+            for i in 0..values.len() {
+                for j in (i+1)..values.len() {
+                    let first_antenna = values[i];
+                    let (x1,y1) = first_antenna;
+                    let second_antenna = values[j];
+                    let (x2,y2) = second_antenna;
+                    let d = ((x2-x1),(y2-y1));
+                    let an1 = ((x1-d.0),(y1-d.1));
+                    let an2 = ((x2+d.0),(y2+d.1));
+                    if (an1.0 < map.lenght) && (an1.1 < map.lenght)
+                    && (an1.0 >= 0) && (an1.1 >= 0)
+                    {
+                        antinodes.insert(an1);
+                    }
+
+                    if (an2.0 < map.lenght) && (an2.1 < map.lenght)
+                    && (an2.0 >= 0) && (an2.1 >= 0)
+                    {
+                        antinodes.insert(an2);
+                    }
+
+                }
+            }
+        }
+        return antinodes.iter().count().to_string();
+    }
+
+    fn part2(&self, input: &str) -> String {
+        let map: Map = Map::from_str(input);
         let mut taken_positions: HashSet<(i32,i32)> = HashSet::new();
         let mut antinodes: HashSet<(i32,i32)> = HashSet::new();
 
@@ -18,49 +56,46 @@ impl Day for Day08 {
         }
         
         for (_, values) in &map.antennas {
-            // println!("combinations for antennas of type {key}");
             for i in 0..values.len() {
                 for j in (i+1)..values.len() {
                     let first_antenna = values[i];
                     let (x1,y1) = first_antenna;
                     let second_antenna = values[j];
                     let (x2,y2) = second_antenna;
-                    // println!("combination of {first_antenna:?} and {second_antenna:?}");
+                    antinodes.insert(first_antenna);
+                    antinodes.insert(second_antenna);
                     let d = ((x2-x1),(y2-y1));
-                    let an1 = ((x1-d.0),(y1-d.1));
-                    let an2 = ((x2+d.0),(y2+d.1));
-                     // println!("an1 {an1:?} an2 {an2:?}");
-                    if (an1.0 < map.lenght) && (an1.1 < map.lenght)
-                    && (an1.0 >= 0) && (an1.1 >= 0)
-                    // && !taken_positions.contains(&an1)
-                    {
-                        antinodes.insert(an1);
-                    }
 
-                    if (an2.0 < map.lenght) && (an2.1 < map.lenght)
-                    && (an2.0 >= 0) && (an2.1 >= 0)
-                    // && !taken_positions.contains(&an2)
-                    {
-                        antinodes.insert(an2);
-                    }
+                    let mut multiplier = 1;
 
-                    // for x in 0..=map.height {
-                    //     for y in 0..=map.lenght {
-                    //     }
-                    // }
+                    loop {
+                        let an1 = ((x1-(d.0*multiplier)),(y1-(d.1*multiplier)));
+                        if (an1.0 < map.lenght) && (an1.1 < map.lenght)
+                        && (an1.0 >= 0) && (an1.1 >= 0)
+                        {
+                            antinodes.insert(an1);
+                        } else {
+                            break;
+                        }
+                        multiplier += 1;
+                    }
+                    multiplier = 1;
+                    
+                    loop {
+                        let an2 = ((x2+(d.0*multiplier)),(y2+(d.1*multiplier)));
+                        if (an2.0 < map.lenght) && (an2.1 < map.lenght)
+                        && (an2.0 >= 0) && (an2.1 >= 0)
+                        {
+                            antinodes.insert(an2);
+                        } else {
+                            break;
+                        }
+                        multiplier += 1;
+                    }
                 }
             }
         }
         return antinodes.iter().count().to_string();
-    }
-
-    fn part2(&self, input: &str) -> String {
-        return input.chars()
-            .map(|e| e.to_digit(10))
-            .filter(|e| e.is_some())
-            .map(|e| e.unwrap())
-            .fold(0, |a,b| a+b )
-            .to_string();
     }
 }
 
@@ -149,6 +184,6 @@ mod tests {
     #[test]
     fn part2_test() {
         let day = Day08;
-        assert_eq!(day.part2(INPUT), "6");
+        assert_eq!(day.part2(INPUT), "34");
     }
 }
