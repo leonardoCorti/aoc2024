@@ -95,11 +95,22 @@ fn day9(c: &mut Criterion) {
         day09::Day09
             .part1(black_box(include_str!("../inputs/09.txt")))
     ));
-    // c.bench_function("day8 part2", |b| b.iter(||
-    //     day08::Day08
-    //         .part2(black_box(include_str!("../inputs/08.txt")))
+    c.bench_function("day9 part2", |b| b.iter(||
+        day09::Day09
+            .part2(black_box(include_str!("../inputs/09.txt")))
+    ));
+}
+
+fn day10(c: &mut Criterion) {
+    c.bench_function("day10 part1", |b| b.iter(||
+        day10::Day10
+            .part1(black_box(include_str!("../inputs/10.txt")))
+    ));
+    // c.bench_function("day10 part2", |b| b.iter(||
+    //     day10::Day10
+    //         .part2(black_box(include_str!("../inputs/10.txt")))
     // ));
 }
 
-criterion_group!(benches, day1, day2, day3, day4, day5, day6, day7, day8, day9);
+criterion_group!(benches, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10);
 criterion_main!(benches);

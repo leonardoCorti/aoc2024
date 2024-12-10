@@ -14,23 +14,28 @@ impl Day for Day09 {
     }
 
     fn part2(&self, input: &str) -> String {
-        return input.chars()
-            .map(|e| e.to_digit(10))
-            .filter(|e| e.is_some())
-            .map(|e| e.unwrap())
-            .fold(0, |a,b| a+b )
-            .to_string();
+        let disk: Disk = input.into();
+        let mut disk = disk.convert_v2();
+        disk.compact();
+        let disk = disk.convert_v1();
+        return disk.checksum().to_string();
     }
 }
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Clone, Debug)]
 enum DiskPosition {
     Empty,
     Block(i32),
 }
 
+#[derive(Debug)]
 struct Disk {
     map: Vec<DiskPosition>
+}
+
+#[derive(Debug)]
+struct DiskV2 {
+    map: Vec<(DiskPosition, i32)>,
 }
 
 impl Disk {
@@ -76,6 +81,82 @@ impl Disk {
             }
         }
         return 0;
+    }
+
+    fn convert_v2(&self) -> DiskV2 {
+        let mut map: Vec<(DiskPosition,i32)> = Vec::new();
+
+        let mut previous: Option<DiskPosition> = Some(self.map[0].clone());
+        let mut count = 0;
+        for val in self.map.iter() {
+            if Some(val) == previous.as_ref() {
+                count += 1;
+            } else {
+                map.push((previous.unwrap(),count));
+                previous = Some(val.clone());
+                count = 1;
+            }
+        }
+        map.push((previous.unwrap(),count));
+
+        return DiskV2 { map };
+    }
+
+}
+
+impl DiskV2 {
+    fn compact(&mut self) {
+        loop {
+            let mut changed = false;
+            for i in (0..self.map.len()).rev() {
+                let element = self.map[i].clone();
+                if element.0 == DiskPosition::Empty {
+                    continue;
+                }
+                // println!("analyzing {i} {element:?}");
+                for j in 0..i {
+                    let second_element = self.map[j].clone();
+
+                    if second_element.0 != DiskPosition::Empty {
+                        continue;
+                    }
+
+                    if element.1 < second_element.1 {
+                        // println!("could insert {i},{:?} {j},{:?}", element, second_element);
+                        self.map[i] = (DiskPosition::Empty,element.1);
+                        self.map[j] = (DiskPosition::Empty, second_element.1-element.1);
+                        self.map.insert(j, (element.0.clone(),element.1));
+                        // println!("done");
+                        changed = true;
+                        break;
+                    } else if element.1 == second_element.1 {
+                        // println!("could swap {i},{:?} {j},{:?}", element, second_element);
+                        self.map.swap(i, j);
+                        changed = true;
+                        break;
+                    }
+                }
+
+                if changed {
+                    break;
+                }
+            }
+
+            if !changed {
+                break;
+            }
+            // println!("{}", self);
+        }
+    }
+
+    fn convert_v1(&self) -> Disk {
+        let mut map: Vec<DiskPosition> = Vec::new();
+        for (val, count) in self.map.iter() {
+            for _ in 0..*count {
+                map.push(val.clone());
+            }
+        }
+        return Disk { map };
     }
 }
 
@@ -126,6 +207,28 @@ impl Display for Disk {
     }
 }
 
+impl Display for DiskV2 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for (val, count) in self.map.iter() {
+            match val {
+                DiskPosition::Empty => {
+                    for _ in 0..*count {
+                        write!(f,".")?;
+                    }
+                },
+                DiskPosition::Block(id) => {
+                    for _ in 0..*count {
+                        write!(f," ")?;
+                        write!(f,"{}", id)?;
+                        write!(f," ")?;
+                    }
+                },
+            }
+        }
+        return Ok(());
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -141,6 +244,6 @@ mod tests {
     #[test]
     fn part2_test() {
         let day = Day09;
-        assert_eq!(day.part2(INPUT), "6");
+        assert_eq!(day.part2(INPUT), "2858");
     }
 }
