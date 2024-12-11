@@ -106,10 +106,10 @@ fn day10(c: &mut Criterion) {
         day10::Day10
             .part1(black_box(include_str!("../inputs/10.txt")))
     ));
-    // c.bench_function("day10 part2", |b| b.iter(||
-    //     day10::Day10
-    //         .part2(black_box(include_str!("../inputs/10.txt")))
-    // ));
+    c.bench_function("day10 part2", |b| b.iter(||
+        day10::Day10
+            .part2(black_box(include_str!("../inputs/10.txt")))
+    ));
 }
 
 criterion_group!(benches, day1, day2, day3, day4, day5, day6, day7, day8, day9, day10);
