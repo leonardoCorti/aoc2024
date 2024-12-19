@@ -7,6 +7,9 @@ edition = "2021"
 colored = "2.1.0"
 rayon = "1.10.0"
 regex = "1.11.1"
+tracing = "0.1.41"
+tracing-subscriber = {version="0.3.19"}
+tracing-test = "0.2.5"
 
 [dev-dependencies]
 criterion = { version = "0.5", features = ["html_reports"] }
